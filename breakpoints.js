@@ -32,10 +32,11 @@
 	};
 
 	$.fn.setBreakpoints = function(settings) {
-		function _trigger(handle, breakpoint) {
-			$(window).trigger(handle + breakpoint);
-			$(window).trigger(handle);
-			console.log(handle, breakpoint);
+		function _trigger(type, breakpoint) {
+			// console.log(handle, breakpoint, type);
+			var win = $(window);
+				win.trigger(type+'Breakpoint' + breakpoint);
+				win.trigger('breakpoint',[breakpoint,type]);
 		}
 		var options = jQuery.extend({
 							distinct: true,
@@ -57,20 +58,20 @@
 						for (var x in options.breakpoints.sort(function(a,b) { return (b-a) })) {
 							if ($('body').hasClass('breakpoint-' + options.breakpoints[x])) {
 								$('body').removeClass('breakpoint-' + options.breakpoints[x]);
-								_trigger('exitBreakpoint', options.breakpoints[x])
+								_trigger('exit', options.breakpoints[x]);
 							}
 						}
 						done = true;
 					}
 					$('body').addClass('breakpoint-' + options.breakpoints[bp]);
-					_trigger('enterBreakpoint', options.breakpoints[bp])
+					_trigger('enter', options.breakpoints[bp]);
 
 				}
 
 				// fire onExit when browser contracts out of a larger breakpoint
 				if (w < options.breakpoints[bp] && lastSize >= options.breakpoints[bp]) {
 					$('body').removeClass('breakpoint-' + options.breakpoints[bp]);
-					_trigger('exitBreakpoint',options.breakpoints[bp]);
+					_trigger('exit', options.breakpoints[bp]);
 				}
 
 				// if in distinct mode, fire onEnter when browser contracts into a smaller breakpoint
@@ -83,7 +84,7 @@
 					!$('body').hasClass('breakpoint-' + options.breakpoints[bp]) // and we aren't already in this breakpoint
 					) {
 					$('body').addClass('breakpoint-' + options.breakpoints[bp]);
-					_trigger('enterBreakpoint', options.breakpoints[bp]);
+					_trigger('enter', options.breakpoints[bp]);
 				}
 			}
 
